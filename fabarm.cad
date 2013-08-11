@@ -1,0 +1,413 @@
+##    Geometry header    ##
+[(koko.prims.utils.Slider, {'name': 'a1', 'min': '0', 'max': '180', 'value': '42.7608590772', 'y': '-124.057872916', 'x': '21.7768316276', 'size': '200'}),(koko.prims.utils.Slider, {'name': 'a2', 'min': '0', 'max': '360', 'value': '337.69163796', 'y': '-181.601834217', 'x': '-0.601049355333', 'size': '200'}),(koko.prims.utils.Slider, {'name': 'a3', 'min': '0', 'max': '180', 'value': '91.887546819', 'y': '-240', 'x': '0', 'size': '200'})]
+##    End of geometry header    ##
+
+# FAB 9000 MECHANICAL DESIGN
+# Units in mm
+# FAB ACADEMY 2013. FRANCISCO SANCHEZ. FAB LAB BARCELONA
+# Released under MIT license http://opensource.org/licenses/MIT
+
+
+from koko.lib.shapes2d import *
+cad.mm_per_unit=1
+
+#
+# 2D or 3D
+#
+flat = True
+
+#
+# MATERIAL AND PHYSICAL PROPERTIES
+#
+density= 1.2 # your frame material density g/cm3. 1.2 for acrylic
+safety_value=1.5 # This factor of safety for the required motor torque
+
+
+# GENERAL DIMENSIONS
+x0=0.
+y0=0.
+s1=3.5
+s2=3.5
+s3=1.5
+R0=70.
+R1=40.
+R2=30.
+R3=20.
+l1=300.
+l2=l1-R1-R3
+l3=20.
+w0=3.
+w1=3.
+w2=3.
+w3=3.
+w4=3.
+he1=R1+12+23.57+10
+he2=R3+10
+a1=a1.value
+a2=a2.value
+a3=a3.value
+ho1=3
+ho2=3
+armwidth=40.
+# DISTANCE CALCULATIONS
+plateh=.8*he1
+# TAB VARIABLES
+kerf=0.
+tabw=6.08
+tabh=3.
+
+
+# DIRECT KINEMATICS
+a1r=math.radians(a1)
+x1=x0+l1*math.cos(a1r)
+y1=y0+l1*math.sin(a1r)
+
+a2r=math.radians(a2)
+x2=x0+x1+l2*math.cos(a2r)
+y2=y0+y1+l2*math.sin(a2r)
+
+#
+# RGB Color map
+#
+
+# ===================================
+# ===================================
+# CUSTOM SHAPES
+# ===================================
+# ===================================
+
+# CUSTOM SHAPE JAMECO MOUNT
+def jameco (x0,y0,angle=0):
+ c1=circle(0,0,6)
+ c2=circle(0,16,1.25)
+ c3=reflect_y(c2)
+ m=c1+c2+c3
+ m=rotate(m,angle)
+ m=move(m,x0,y0)
+ m.shape=True
+ return m
+
+# CUSTOM SHAPE NEMA 8 MOUNT
+def nema8 (x0,y0,angle=0):
+ c1=circle (0,0,8)
+ c8=circle(8,8,1)
+ c8=c8+reflect_x(c8) 
+ c8=c8+reflect_y(c8)
+ m=c1+c8
+ m=rotate(m,angle)
+ m=move(m,x0,y0)
+ m.shape=True
+ return m
+
+# CUSTOM SHAPE NEMA 17 MOUNT
+def nema17 (x0,y0,angle=0):
+ c1=circle (0,0,12)
+ c17=circle(15.5,15.5,1.7)
+ c17=c17+reflect_x(c17) 
+ c17=c17+reflect_y(c17)
+ m=c1+c17
+ m=rotate(m,angle)
+ m=move(m,x0,y0)
+ m.shape=True
+ return m
+
+# CUSTOM SHAPE NEMA 23 MOUNT
+def nema23 (x0,y0,angle=0):
+ c1=circle (0,0,3.5)
+ c23=circle(23.57,23.57,2.5)
+ c23=c23+reflect_x(c23) 
+ c23=c23+reflect_y(c23)
+ m=c1+c23
+ m=rotate(m,angle)
+ m=move(m,x0,y0)
+ m.shape=True
+ return m
+
+
+# CUSTOM SHAPE STEPPER PRINTER MOUNT
+def printer (x0,y0,angle=0):
+ c=circle (0,0,5.5)
+ c17=circle(17.5,17.5,1.25)
+ c17=c17+reflect_x(c17) 
+ c17=c17+reflect_y(c17)
+ m=c+c17
+ m=rotate(m,angle)
+ m=move(m,x0,y0)
+ m.shape=True
+ return m
+
+# CUSTOM SHAPE HOLE
+def hole(x0,y0,angle=0):
+ h=rectangle(0,tabw-kerf,0,tabh-kerf)
+ h=move(h,-(tabw-kerf)/2,-(tabh-kerf)/2)
+ h=rotate(h,angle)
+ h=move(h,x0,y0)
+ h.shape=True
+ return h
+
+# CUSTOM SHAPE PACMAN GHOST SHOULDER
+def Shoulder(x0, y0, radius, shaft, height,angle=0,mount="",anglemount=0):
+        b=circle(0,0,radius)
+        r1=rectangle(-radius,radius,-height,0)
+        s1=circle(0,0,shaft)
+        b= b + r1
+        b= b - s1
+        # PACMAN
+        circler=radius/5
+        b=b+circle(0,-height,circler)
+        b=b+circle(radius-circler,-height,circler)
+        b=b+circle(-radius+circler,-height,circler)
+        b=b-circle((radius-circler)/2,-height,circler)
+        b=b-circle(-(radius-circler)/2,-height,circler)
+        b=b-circle((radius-circler)/2,0,circler)
+        b=b-circle(-(radius-circler)/2,0,circler)
+        b-=circle(0,-height-circler/3,1.5)
+        b-=circle(4*circler,-height-circler/3,1.5)
+        b-=circle(-4*circler,-height-circler/3,1.5)
+        # HOLES
+        h1=hole(0,-plateh,0)
+        h2=hole((-radius+1.5*tabw),-plateh,0)
+        h3=reflect_x(h2)
+        #b=b-h1-h2-h3
+        # MOUNT
+        if mount=="nema17":
+         m=nema17(0,-radius-12,anglemount)
+         b=b-m
+        elif mount=="jameco":
+         m=jameco(0,-radius-12,anglemount)
+         b=b-m
+        elif mount=="nema8":
+         m=nema8(0,-radius-12,anglemount)
+         b=b-m
+        elif mount=="nema23":
+         m=nema23(0,-radius-12,anglemount)
+         b=b-m
+        elif mount=="nema23up":
+         m=nema23(0,0,anglemount)
+         b=b-m
+        elif mount=="printer":
+         m=printer(0,-radius-12,anglemount)
+         b=b-m
+        b=rotate(b,angle)
+        b=move(b,x0,y0)    
+        b.shape = True
+        return b
+   
+
+# CUSTOM SHAPE ARM
+def Arm(x0, y0, length, Radius, radius, shaft, holes, angle=0,mount="",anglemount=0):
+    # First Circle
+    c1= circle(0,0,Radius)
+    s1= circle (0,0,shaft)
+    # Second Circle
+    c2=circle(length,0,radius)
+    s2=circle(length,0,shaft)
+    # Triangles
+    alpha=math.acos((Radius-radius)/length)
+    dx=(Radius-radius)*math.cos(alpha)
+    dy=(Radius-radius)*math.sin(alpha) 
+    t1=triangle(0,0,dx,dy,length,0) # BEWARE THE ORDER
+    t1=move(t1,radius*math.cos(alpha),radius*math.sin(alpha))
+    t2=reflect_y(t1)
+    t= t1 + t2
+    # Rectangle
+    r1=rectangle(radius*math.cos(alpha),length+radius*math.cos(alpha),-radius*math.sin(alpha),+radius*math.sin(alpha))
+    # Composing
+    brazo= c1 + c2
+    brazo= brazo + r1
+    brazo= brazo + t
+    brazo= brazo - s1
+    brazo= brazo - s2
+    # Radial holes
+    rh=circle(0,Radius-5,1.5)
+    for i in range (12):
+     rh=rotate(rh,30)
+     brazo=brazo - rh
+    # Radial holes 2
+    rh2=circle(0,radius-5,1.5)
+    for i in range (11):
+     rh2=rh2+ rotate(rh2,30)
+    rh2=move(rh2,length,0)
+    brazo=brazo - rh2
+    # Calculate equation of line y=mx+b
+    m=dy/(dx-length)
+    b=radius
+    # Removing holes
+    for i in range(holes): # STARTS IN 0!!
+        x=(i+1)*length/(holes+1)
+        rad=m*x+b
+        circ_rad=rad
+        hole=circle(x,0,circ_rad)
+        hole2=circle(x,m*x+b+5,1.5)
+        hole3=reflect_y(hole2)
+        brazo = brazo - hole -hole2 -hole3  
+    # MOUNT
+    if mount=="nema17":
+         m=nema17(length-radius-12,0,anglemount)
+         brazo=brazo-m
+    elif mount=="jameco":
+         m=jameco(length-radius-12,0,anglemount)
+         brazo=brazo-m
+    elif mount=="nema8":
+         m=nema8(length,0,anglemount)
+         brazo=brazo-m
+    elif mount=="nema23":
+         m=nema23(length-radius-12,0,anglemount)
+         brazo=brazo-m
+    elif mount=="printer":
+         m=printer(length-radius-12,0,anglemount)
+         brazo=brazo-m
+    brazo=rotate(brazo,angle) 
+    brazo=move(brazo,x0,y0)   
+    brazo.shape = True
+    return brazo
+
+# CUSTOM SHAPE WRIST
+def wrist(x0, y0, radius, shaft, height,angle=0):
+        b=circle(0,0,radius)
+        r1=rectangle(-radius,radius,-height,0)
+        s1=circle(0,0,shaft)
+        s1-=rectangle(1.5,3,-3,3)
+        b= b + r1
+        b= b - s1
+        slot1=slot(0,-height,tabw,tabh,180)
+        slot2=slot(radius-1.25*tabw,-height,tabw,tabh,180)
+        slot3=slot(-radius+1.25*tabw,-height,tabw,tabh,180)
+        b=b-slot1-slot2-slot3
+        rh=circle(radius-5,0,1.25)
+        for i in range (12): 
+         b=b - rh      
+         rh=rotate(rh,30)
+        b=rotate(b,angle)
+        b=move(b,x0,y0)
+        b.shape = True
+        return b
+
+# CUSTOM SHAPE TOOL MOUNT
+def tool(x0,y0,width,height):
+     r=rectangle(0,width,0,height)
+     hole=circle(1*width/4,height/4,1.25)
+     hole=hole+circle(1*width/4,height/2,1.25)
+     hole=hole+circle(1*width/4,3*height/4,1.25)
+     hole=hole+move(hole,width/4,0,0)
+     hole=hole+move(hole,width/4,0,0)
+     r=r-hole
+     r=move(r,-width/2,-height/2)
+     tab1=tab(-width/2,0,tabw,tabh,90)
+     tab1=tab1+ tab(-width/2,-R3+1.25*tabw,tabw,tabh,90)
+     tab1=tab1+ tab(-width/2,R3-1.25*tabw,tabw,tabh,90)
+     tab1=tab1+reflect_x(tab1)
+     r=r+tab1
+     r.shape=True
+     return r
+     
+# CUSTOM FUNCTION AREA ARM
+
+def armArea(l,R,r,S,s,n):
+    # parameters
+    h=math.sqrt(l**2-(R-r)**2)
+    alpha=math.acos((R-r)/l)
+    beta=math.pi-alpha
+    # calculating areas
+    A1=(R-r)*h/2
+    A2=h*r
+    A3=0.5*beta*R**2
+    A4=0.5*alpha*r**2
+    AT=2*(A1+A2+A3+A4)
+    # calculate area drills
+    area_shafts=math.pi*(S**2+s**2) 
+    area_30holes=30*(math.pi*1.5**2)
+    # Calculate equation of line y=mx+b
+    dx=(R-r)*math.cos(alpha)
+    dy=(R-r)*math.sin(alpha) 
+    m=dy/(dx-l)
+    b=r
+    # Calculate area big holes
+    a_hole=0 # Init area of big holes
+    for i in range(n): # STARTS IN 0!!
+        x=(i+1)*l/(n+1)
+        rad=m*x+b
+        a_hole+=math.pi*rad**2
+    # remove holes
+    AT=AT-area_shafts-area_30holes-a_hole
+    return AT/100 # in cm2
+
+#================================================================
+#================================================================
+# DRAWING STARTS HERE
+#================================================================
+#================================================================  
+
+base=Shoulder(x0,y0,R1,s1,he1,0)
+base.color='blue'
+if not flat:    
+  base = extrusion(base, 0, w1)
+  base=move(base,0,0,armwidth/2)
+  base2=reflect_z(base)
+  base=base+base2
+  base=rotate_x(base,90)
+
+base2=Shoulder(x0+2*R1+4,y0,R1,s1,he1,0,"nema23",45)
+base2.color='blue'
+
+
+redarm=Arm(x0,y0,l1,R1,R2,s2,ho1,0,"printer",45)
+redarm.color='red'
+holes=circle(0,9.5,1.5)
+for i in range (6):
+ holes+=rotate(holes,60)
+redarm-=holes
+if not flat:   
+  redarm = extrusion(redarm, 0, w2)
+  redarm=move(redarm,0,0,armwidth/2-w1)
+  redarm2=reflect_z(redarm)
+  redarm=redarm+redarm2
+  redarm=rotate_x(redarm,90)
+
+
+yelarm=Arm(x1,y1,l2,R2,R3,s3,ho2,0,"nema8",0)
+yelarm.color='yellow'
+if not flat:    
+  yelarm = extrusion(yelarm, 0, w3)
+  yelarm= move(yelarm,0,0,armwidth/2)
+  yelarm2=reflect_z(yelarm)
+  yelarm=yelarm+yelarm2
+  yelarm=rotate_x(yelarm,90)
+
+
+wrist1=wrist(x2,y2,R3,2,he2,90)
+wrist1.color='green'
+if not flat:    
+  wrist = extrusion(wrist, 0, w4)
+  wrist = move(wrist,0,0,w3)
+  wrist= move(wrist,0,0,armwidth/2)
+  wrist2=reflect_z(wrist)
+  wrist=wrist+wrist2
+  wrist=rotate_x(wrist,90)
+wrist2=wrist(x2+44,y2,R3,s3,he2,a3)
+wrist2.color='green'
+
+toolmount=tool(0,0,armwidth,2*R3)
+toolmount.color='tan'
+
+# Arm physics
+print '#######################'
+print '## PHYSIC PROPERTIES ##'
+print '#######################'
+print ''
+area_redarm=armArea(l1,R1,R2,s1,s2,ho1)
+area_yelarm=armArea(l2,R2,R3,s2,s3,ho2)
+
+vol_redarm=area_redarm*w1/10
+vol_yelarm=area_yelarm*w2/10
+
+mass_redarm=density*vol_redarm
+mass_yelarm=density*vol_yelarm
+
+print 'Red Arm mass:',("%.2f" % mass_redarm),'g'
+print 'Yellow Arm mass:',("%.2f" % mass_yelarm),'g'
+print ''
+print '-----------------------'
+
+
+cad.shapes = wrist1,

@@ -1,0 +1,108 @@
+from koko.lib.shapes import *
+cad.mm_per_unit=1
+
+# Created by Francisco from Fab Academy 2013 in Fab Lab Barcelona. May 2013
+# Released under MIT license http://opensource.org/licenses/MIT
+
+#
+# VARIABLES
+#
+
+pitch=8. # Belt pitch mm
+width=5. # Belt width mm
+rad=1.59 # Teeth radius mm
+finish_bit= 1./32. # Smallest Ballend bit for the finishing
+small_rad=25.4*finish_bit/2
+small_dia=2*small_rad
+if small_dia<25.4/32:
+  print "\n=== WARNING: ===\nYour ballend bit diameter is",25.4/32,"mm.\nIn this design the smallest detail has a diameter of",small_dia,"mm.\nThis mold can't be milled with a 1/32 bit\n"
+
+height=2. # Belt height mm
+num_teeth=5 # Number of teeth in the belt mold (integer)
+gear_teeth= 15 # Number of teeth in the gear (integer)
+mold_wall=2. # Desired plastic mold wall mm
+silicone_wall=5 # Desired silicone mold wall mm
+wax_wall=5 # Desired wax mold wall mm
+shaft= 6 # Gear Shaft diameter
+if gear_teeth<1: gear_teeth=3  # Prevents kokopelli crashing
+#
+# SELECT OUTPUT
+#
+
+# Uncomment desired output
+#output="belt"
+output="plastic"
+#output="silicone"
+#output="wax"
+#output="gear"
+
+
+
+# DRAW THE BELT
+cyl1=cylinder(0,0,0,width,rad)
+cyl2=cylinder(0,rad,0,width,small_rad)
+cyl=cyl1-cyl2
+cub1=cube(-pitch/2,pitch/2,-height,0,0,width)
+cyl3=cylinder(-pitch/2,0,0,width,small_rad)
+cyl4=cylinder(pitch/2,0,0,width,small_rad)
+cub=cub1-cyl3-cyl4
+belt= cyl+cub
+
+for i in range (num_teeth-1):
+ belt+=move(belt,pitch,0)
+
+belt=rotate_x(belt,-90)
+belt=move(belt,-(num_teeth-1)*pitch/2,-width/2,-height)
+if output=="belt": belt.color='yellow'
+
+# DRAW THE PLASTIC
+cub2=cube(-(num_teeth-1)*pitch/2,(num_teeth-1)*pitch/2,-width/2-4*mold_wall,width/2+4*mold_wall,-height-rad-mold_wall,0)
+
+cyl5=cylinder(0,0,-height-rad-mold_wall,0,2)
+cub3=cube(-3,0,-1.5,1.5,-mold_wall-height-rad,0)
+tab=cyl5+cub3
+tab=move(tab,3,0,0)
+tab=move(tab,(num_teeth-1)*pitch/2,width/2+2*mold_wall,0)
+tab2=move(tab,-(num_teeth-1)*pitch,0,0)
+tab+=rotate_z(tab,180)
+tab2+=rotate_z(tab2,180)
+plastic=cub2-belt+tab-tab2
+
+# DRAW THE SILICONE
+
+x_silicone=(num_teeth-1)*pitch/2+4+3+silicone_wall
+y_silicone=width/2+4*mold_wall+silicone_wall
+z_silicone=height+rad+mold_wall
+cub4=cube(-x_silicone,x_silicone,-y_silicone,y_silicone,-z_silicone,silicone_wall)
+silicone=cub4-plastic
+
+if output=="silicone": silicone.color='red'
+
+# DRAW WAX
+x_wax=x_silicone+wax_wall
+y_wax=y_silicone+wax_wall
+z_wax=z_silicone+wax_wall
+cub5=cube(-x_wax,x_wax,-y_wax,y_wax,-z_wax,silicone_wall)
+wax=cub5-silicone
+if output=="wax": wax.color='blue'
+
+# DRAW THE GEAR
+pitch_rad=pitch*gear_teeth/(2*math.pi)
+c1=circle(0,0,pitch_rad)
+c2=circle(0,0,shaft/2)
+c3=circle(0,pitch_rad,rad)
+for i in range (gear_teeth):
+ c3+=rotate(c3,360/gear_teeth)
+gear=c1-c2-c3
+print 'Gear Diameter:', pitch_rad*2
+
+if output=="belt":
+ cad.shapes = belt
+elif output=="plastic":
+ cad.shapes = plastic
+elif output=="silicone":
+ cad.shapes = silicone
+elif output=="wax":
+ cad.shapes = wax
+elif output=="gear":
+ cad.shapes = gear
