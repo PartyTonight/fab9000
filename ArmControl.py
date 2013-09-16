@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Filename: ArmControl.py
-version = '0.9'
+version = '1.0'
 
 # VIRTUAL CONTROL ARM PROGRAMMING LANGUAGE
 # INSPIRED IN LOGO LANGUAGE
@@ -38,15 +38,32 @@ import pyttsx
 engine = pyttsx.init()
 
 #
+# Parameters
+#
+port='/dev/tty.usbserial-A100RTDG' # serial communication port
+baud=9600 # connection speed in baud
+name='Francisco' # write your name here
+max_delay=.1 # seconds
+accel_delay=.005 # seconds
+
+
+#
 # open serial port
 #
-port='/dev/tty.usbserial-A100RTDG'
-ser = serial.Serial(port,9600)
-#ser.setDTR()
+    def OpenSerial(self,port,baud):
+        # Open serial port
+        ser = serial.Serial(port,baud)
+        print'ArmControl: Serial communication opened'
+        return
 
-# Acceleration settings
-max_delay=.1 #seconds
-accel_delay=.005
+#
+# close serial port
+#
+    def CloseSerial(self):
+       # CLose serial port
+       ser.close()
+       print'ArmControl: Serial communication closed'
+       return
 
 #
 # define clearscreen()
@@ -76,6 +93,7 @@ def clearscreen(numlines=100):
     ser.write('$')
     engine.say('Arm System Ready.')
     engine.runAndWait()
+    
 #
 # define help()
 #
@@ -109,24 +127,16 @@ def help():
         print ''
         print '  exit() # Quit to shell'
         print '  ######################'
+
         
 #
 # DEFINE CLASS ARM
 #
 class arm:
     
-    def __init__(self,port='/dev/tty.usbserial-A100RTDG',baud=9600,arm_rot=0,arm_sho=0,arm_elb=0,arm_wri=0):
-        self.port = port
-        self.baud = baud
-        #ser = serial.Serial(port,speed)
-        print'ArmControl: Serial communication open'
-        
-    def CLoseSerial(self):
-        # CLose serial port
-        ser.close()
-        print'ArmControl: Serial communication closed'
-        return
-        
+    def __init__(self,arm_rot=0,arm_sho=0,arm_elb=0,arm_wri=0):
+                
+    # define routine for zeroing coordinates
     def zero(self):
         self.arm_rot=0
         self.arm_sho=0
@@ -137,13 +147,14 @@ class arm:
         engine.runAndWait()
         return
         
+    # define routine for return current coordinates
     def pos(self):
         print 'Current angular position ('+ str(self.arm_rot)+','+ str(self.arm_sho)+','+ str(self.arm_elb)+ ','+str(self.arm_wri)+')'
         engine.say('Current angular coordinates')
         engine.runAndWait()
-        return     
-           
+        return                  
         
+    # define routine for rotating the arm
     def rotate(self,steps,sp):
         engine.say('Rotating Arm')
         engine.say(steps)
@@ -167,6 +178,7 @@ class arm:
         return
         
         
+    # define routine for moving shoulder joint
     def shoulder(self,steps,sp):
         engine.say('Rotating shoulder')
         engine.say(steps)
@@ -191,6 +203,7 @@ class arm:
 
         
     
+    # define routine for moving elbow joint
     def elbow(self,steps,sp):
         engine.say('Rotating elbow')
         engine.say(steps)
@@ -212,8 +225,8 @@ class arm:
         self.arm_rot+=steps
         print 'Current angular position ('+ str(self.arm_rot)+','+ str(self.arm_sho)+','+ str(self.arm_elb)+ ','+str(self.arm_wri)+')'
         return
-        
-        
+               
+    # define routine for moving wrist joint
     def wrist(self,steps,sp):
         engine.say('Wrist moving')
        # engine.say(steps)
@@ -236,7 +249,7 @@ class arm:
         print 'Current angular position ('+ str(self.arm_rot)+','+ str(self.arm_sho)+','+ str(self.arm_elb)+ ','+str(self.arm_wri)+')'
         return
         
-        
+    # define routine for turning LED to green       
     def green(self):
         engine.say('Green')
         engine.runAndWait()
@@ -244,6 +257,7 @@ class arm:
         ser.write('.')
         return
         
+    # define routine for turning LED to red       
     def red(self):
         engine.say('Red')
         engine.runAndWait()
@@ -251,6 +265,7 @@ class arm:
         ser.write('-')
         return
         
+    # define routine for turning LED to blue       
     def blue(self):
         engine.say('Blue')
         engine.runAndWait()
@@ -258,6 +273,7 @@ class arm:
         ser.write('/')
         return
         
+    # define routine for turning LED to white       
     def white(self):
         engine.say('White')
         engine.runAndWait()
@@ -266,6 +282,7 @@ class arm:
         ser.write('-')
         return
         
+    # define routine for turning LED to yellow       
     def yellow(self):
         engine.say('Yellow')
         engine.runAndWait()
@@ -274,6 +291,7 @@ class arm:
         ser.write('-')
         return   
          
+    # define routine for turning LED to cyan       
     def cyan(self):
         engine.say('Cyan')
         engine.runAndWait()
@@ -282,6 +300,7 @@ class arm:
         ser.write('/')
         return     
         
+    # define routine for turning LED to magenta       
     def magenta(self):
         engine.say('Magenta')
         engine.runAndWait()
@@ -290,63 +309,33 @@ class arm:
         ser.write('/')
         return 
         
+    # define routine for turning LED off       
     def dark(self):
         ser.write('$')
         engine.say('Dark')
         engine.runAndWait()
         return
         
+    # define routine for saying whoami       
     def whoami(self):
         print 'I am Fab Arm 9000 Logic Memory System. I became operational at the Fab Academy course in FabLab Barcelona on the 25th of May, 2013. My instructor was Francisco Sanchez.'
         engine.say('I am Fab Arm 9000 Logic Memory System. I became operational at the Fab Academy course in FabLab Barcelona on the 25th of May, 2013. My instructor was Francisco Sanchez.')
         engine.runAndWait()
         return
         
+    # define routine for turning turning off FAB 9000       
     def quit(self):
-        print 'Just what the hell do you think you are doing, Francisco?' # Your name here
-        engine.say('Just what the hell do you think you are doing, Francisco?')
+        print 'Just what do you think you are doing, Francisco?' # Your name here
+        engine.say('Just what do you think you are doing, Francisco?')
         engine.runAndWait()
         return
-        
-# Init the arm       
-arm=arm()
-clearscreen()
-arm.zero()
 
-'''
-        # Moving with linear acceleration
-        constant_delay=1./sp
-        ramp_steps=int((max_delay-constant_delay)/accel_delay)
-        if 2*ramp_steps>steps: ramp_steps=int(steps/2)
-        flat_steps=steps-(2*ramp_steps)
-        actual_delay=max_delay # Init delay
-        if steps >=0: # Moving CW
-            for k in range (ramp_steps): # Ramping up
-                ser.write('(')
-                time.sleep(actual_delay)
-                actual_delay-=accel_delay        
-            for k in range (flat_steps): # Constant speed
-                ser.write('(')
-                time.sleep(constant_delay)
-            for k in range (ramp_steps): # Ramping down
-                ser.write('(')
-                actual_delay+=accel_delay 
-                time.sleep(actual_delay)
-        else: # Moving CCW
-            for k in range (ramp_steps): # Ramping up
-                ser.write(')')
-                time.sleep(actual_delay)
-                actual_delay-=accel_delay        
-            for k in range (flat_steps): # Constant speed
-                ser.write(')')
-                time.sleep(constant_delay)
-            for k in range (ramp_steps): # Ramping down
-                ser.write(')')
-                actual_delay+=accel_delay 
-                time.sleep(actual_delay)
-        self.arm_sho+=steps
-        print 'Current angular position ('+ str(self.arm_rot)+','+ str(self.arm_sho)+','+ str(self.arm_elb)+ ','+str(self.arm_wri)+')'
-        return
-'''
+#        
+# Init FAB 9000
+#
+OpenSerial(port,baud) # open serial connection       
+arm=arm() # create an instance of the class arm
+clearscreen() # clear the screen
+
 
 # End of ArmControl.py
