@@ -59,8 +59,10 @@ def OpenSerial(port,baud):
     ser.baudrate = baud
     ser.port = port
     ser.open()
-    print'ArmControl: Serial communication opened'
-    return
+    if ser.isOpen==True:
+        print'ArmControl: Serial communication opened'
+    else:
+        print'ArmControl: There was a problem while opening serial connection'
 
 #
 # close serial port
@@ -68,8 +70,9 @@ def OpenSerial(port,baud):
 def CloseSerial():
     # CLose serial port
     ser.close()
-    print'ArmControl: Serial communication closed'
-    return
+    if ser.isClosed()==True:
+        print'ArmControl: Serial communication closed'
+
 
 #
 # define clearscreen()
@@ -87,18 +90,21 @@ def clearscreen(numlines=100):
     else:
         # Fallback for other operating systems.
         print '\n' * numlines
-    print 'Welcome to ArmControl.py version '+ version
-    print 'Created by Francisco Sanchez Arroyo. Fab Academy 2013'
-    print 'Type help() for help'
-    print 'System Ready!'
-    ser.write('-')
-    ser.write('$')
-    ser.write('.')
-    ser.write('$')
-    ser.write('/')
-    ser.write('$')
-    engine.say('Arm System Ready.')
-    engine.runAndWait()
+    if ser.isOpen()==True:
+        print 'Welcome to ArmControl.py version '+ version
+        print 'Created by Francisco Sanchez Arroyo. Fab Academy 2013'
+        print 'Type help() for help'
+        print 'Serial connection open'
+        print 'System Ready!'
+        ser.write('-')
+        ser.write('$')
+        ser.write('.')
+        ser.write('$')
+        ser.write('/')
+        ser.write('$')
+        engine.say('Arm System Ready.')
+        engine.runAndWait()
+    else: print 'No serial connection to the arm'
     
 #
 # define help()
@@ -110,6 +116,11 @@ def help():
         print ''
         print '  help() # This help'
         print '  clearscreen() # Clears the console'
+        print ''
+        print '  Serial connection:'
+        print '  ------------------'
+        print '  OpenSerial(port,baud) # Opens serial connection'
+        print '  CloseSerial() # Closes serial connection'
         print ''
         print '  Arm movements:'
         print '  --------------'
