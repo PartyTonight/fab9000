@@ -42,7 +42,7 @@ engine = pyttsx.init()
 #
 port='/dev/tty.usbserial-A100RTDG' # serial communication port
 baud=9600 # connection speed in baud
-name='Francisco' # write your name here
+name='Dave' # write your name here
 max_delay=.1 # seconds
 accel_delay=.005 # seconds
 
@@ -342,8 +342,10 @@ class arm:
         
     # define routine for turning turning off FAB 9000       
     def quit(self):
-        print 'Just what do you think you are doing, Francisco?' # Your name here
-        engine.say('Just what do you think you are doing, Francisco?')
+        print 'Just what do you think you are doing, '+name+'?'
+        engine.say('Just what do you think you are doing,')
+        engine.say (name)
+        engine.say ('?')
         engine.runAndWait()
         return
 
