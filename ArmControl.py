@@ -50,20 +50,20 @@ accel_delay=.005 # seconds
 #
 # open serial port
 #
-    def OpenSerial(self,port,baud):
-        # Open serial port
-        ser = serial.Serial(port,baud)
-        print'ArmControl: Serial communication opened'
-        return
+def OpenSerial(self,port,baud):
+    # Open serial port
+    ser = serial.Serial(port,baud)
+    print'ArmControl: Serial communication opened'
+    return
 
 #
 # close serial port
 #
-    def CloseSerial(self):
-       # CLose serial port
-       ser.close()
-       print'ArmControl: Serial communication closed'
-       return
+def CloseSerial(self):
+    # CLose serial port
+    ser.close()
+    print'ArmControl: Serial communication closed'
+    return
 
 #
 # define clearscreen()
@@ -135,7 +135,7 @@ def help():
 class arm:
     
     def __init__(self,arm_rot=0,arm_sho=0,arm_elb=0,arm_wri=0):
-                
+        pass
     # define routine for zeroing coordinates
     def zero(self):
         self.arm_rot=0
