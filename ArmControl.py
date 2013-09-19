@@ -46,20 +46,26 @@ name='Francisco' # write your name here
 max_delay=.1 # seconds
 accel_delay=.005 # seconds
 
+#
+# define serial communication
+#
+ser = serial.Serial()
 
 #
 # open serial port
 #
-def OpenSerial(self,port,baud):
+def OpenSerial(port,baud):
     # Open serial port
-    ser = serial.Serial(port,baud)
+    ser.baudrate = baud
+    ser.port = port
+    ser.open()
     print'ArmControl: Serial communication opened'
     return
 
 #
 # close serial port
 #
-def CloseSerial(self):
+def CloseSerial():
     # CLose serial port
     ser.close()
     print'ArmControl: Serial communication closed'
@@ -333,7 +339,7 @@ class arm:
 #        
 # Init FAB 9000
 #
-OpenSerial(port,baud) # open serial connection       
+OpenSerial('/dev/tty.usbserial-A100RTDG',9600) # open serial connection       
 arm=arm() # create an instance of the class arm
 clearscreen() # clear the screen
 
