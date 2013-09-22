@@ -49,7 +49,7 @@
 #define B1 (1 << PA4) // "
 #define on_delay() _delay_us(50) // PWM on time was 25 Chris 50
 #define off_delay() _delay_us(10) // PWM off time was 5 Chris 10
-#define PWM_count 125 // number of PWM cycles was 100 Chris 200
+#define PWM_count 150 // number of PWM cycles was 100 Chris 200
 
 // From Network
 #define bit_delay_time 100 // bit delay for 9600 with overhead
